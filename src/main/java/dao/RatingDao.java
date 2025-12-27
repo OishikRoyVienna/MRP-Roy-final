@@ -135,7 +135,6 @@ public class RatingDao {
         return list;
     }
 
-    // ✅ Vollständig implementierte Methoden (kein "TODO" mehr)
     public int countByUser(String username) {
         String sql = "SELECT COUNT(*) FROM ratings WHERE username = ?";
         try (Connection conn = DatabaseManager.getConnection();

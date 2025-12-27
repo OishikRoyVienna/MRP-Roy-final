@@ -119,18 +119,18 @@ public class MediaDao {
         GROUP BY genre 
         ORDER BY COUNT(*) DESC 
         LIMIT 1
-        """;  // ✅ "DESC" statt "DES C"
+        """;
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return rs.getString("genre");  // ✅ Gibt Genre zurück
+                return rs.getString("genre");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;  // ✅ Fallback, falls kein Genre gefunden
+        return null;
     }
 }

@@ -12,13 +12,11 @@ import http.Response;
 import http.Status;
 
 public class Application {
-    // Handler-Instanzen – leicht erweiterbar
     private final UserHandler userHandler = new UserHandler();
     private final MediaHandler mediaHandler = new MediaHandler();
     private final RatingHandler ratingHandler = new RatingHandler();
     private final FavoriteHandler favoriteHandler = new FavoriteHandler();
 
-    // 🔑 Die einzige öffentliche Methode – wie von deinem Handler.java verlangt
     public Response handle(Request request) {
         // Routing: Wer ist zuständig?
         if (request.getPath().startsWith("/api/users")) {

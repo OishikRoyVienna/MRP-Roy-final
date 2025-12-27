@@ -153,7 +153,6 @@ public class MediaHandler {
     private Response handleList(Request request) {
         String query = request.getPath(); // oder erweitere Request um getQuery()
         String titleFilter = null;
-        // TODO: Query-Parameter extrahieren (z. B. "/api/media?title=Incept")
         List<MediaEntry> entries = mediaService.list(titleFilter);
         return new Response(Status.OK, ContentType.APPLICATION_JSON,
                 JsonUtil.toJson(entries));

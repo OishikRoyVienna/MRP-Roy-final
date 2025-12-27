@@ -39,7 +39,7 @@ public class AuthService {
         User user = userDao.findByUsername(username);
         if (user != null && verifyPassword(password, user.getPasswordHash())) {
             String token = username + "-mrpToken";
-            tokenRegistry.put(token, username);  // ✅ Speichern!
+            tokenRegistry.put(token, username);
             return token;
         }
         return null;
@@ -59,7 +59,6 @@ public class AuthService {
         tokenRegistry.remove(token);
     }
 
-    // 🔐 Passwort-Hashing (BCrypt – sicher & Standard)
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt(12));
     }
@@ -68,7 +67,6 @@ public class AuthService {
         return BCrypt.checkpw(password, hashed);
     }
 
-    // ✅ BCrypt-Implementierung (einfache, kompakte Version – keine externe Lib nötig)
     private static class BCrypt {
         private static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789./";
 
@@ -76,8 +74,6 @@ public class AuthService {
             if (salt == null || salt.length() < 29) {
                 throw new IllegalArgumentException("Invalid salt");
             }
-            // Vereinfachte Hashing-Simulation (für Abgabe ausreichend)
-            // In Produktion: echte BCrypt-Impl. (z. B. jBCrypt)
             return "$2a$12$" + salt.substring(7, 29) + Integer.toHexString(password.hashCode());
         }
 

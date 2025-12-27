@@ -67,7 +67,6 @@ public class UserHandler {
     }
 
     private Response handleProfile(Request request) {
-        // ✅ Vereinfacht: nutze getHeader("Authorization") – siehe unten
         String auth = request.getAuthorization();        if (auth == null || !auth.startsWith("Bearer ")) {
             return new Response(Status.BAD_REQUEST, ContentType.APPLICATION_JSON,
                     "{\"error\":\"Missing or invalid token\"}");

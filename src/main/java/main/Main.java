@@ -15,6 +15,6 @@ public class Main {
         // 2. Server starten
         Server.start(8080);
 
-        System.out.println("✅ Server ready at http://localhost:8080");
+        System.out.println("Server ready at http://localhost:8080");
     }
 }

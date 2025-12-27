@@ -11,10 +11,9 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class Handler implements HttpHandler {
-    private final Application application;       // ← Typ geändert zu konkreter Klasse
+    private final Application application;
     private final RequestMapper requestMapper;
 
-    // Konstruktor angepasst: Application (Klasse), nicht Application (Interface)
     public Handler(Application application, RequestMapper requestMapper) {
         this.application = application;
         this.requestMapper = requestMapper;
@@ -23,9 +22,8 @@ public class Handler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         Request request = requestMapper.fromExchange(exchange);
-        Response response = application.handle(request);  // ← weiterhin gleich
+        Response response = application.handle(request);
         send(exchange, response);
-        return response;
     }
 
     private void send(HttpExchange exchange, Response response) throws IOException {
