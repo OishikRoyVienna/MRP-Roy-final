@@ -25,7 +25,7 @@ public class UserService {
             tokenToUsername.put(token, username);
             return token;
         }
-        return null; // → führt zu 401 Unauthorized
+        return null;
     }
 
     public void register(String username, String password) {
@@ -35,7 +35,6 @@ public class UserService {
         if (userDao.exists(username)) {
             throw new IllegalArgumentException("Username already exists");
         }
-
         userDao.insert(new User(username, password));
     }
 
@@ -43,7 +42,7 @@ public class UserService {
         return tokenToUsername.get(token);
     }
 
-    }
+    // ✅ Entferne die falsche } hier – war eine zu viel!
 
     public Map<String, Object> getProfile(String username) {
         int totalRatings = ratingDao.countByUser(username);
