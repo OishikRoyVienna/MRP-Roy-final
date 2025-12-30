@@ -3,16 +3,16 @@ package dao;
 import java.sql.*;
 
 public class DatabaseManager {
-    private static final String URL = "jdbc:postgresql://localhost:5432/mrp";
-    private static final String USER = "mrp";
-    private static final String PASSWORD = "mrp";
+    protected static final String URL = "jdbc:postgresql://localhost:5432/mrp";
+    protected static final String USER = "mrp";
+    protected static final String PASSWORD = "mrp";
 
     public static void initializeDatabase() {
         try (Connection conn = getConnection()) {
             DatabaseMetaData meta = conn.getMetaData();
             try (ResultSet rs = meta.getTables(null, null, "users", new String[]{"TABLE"})) {
                 if (!rs.next()) {
-                    //erstelung von tabellen
+                    //erstellung von tabellen
                     try (Statement stmt = conn.createStatement()) {
                         stmt.execute("""
                             CREATE TABLE users (
