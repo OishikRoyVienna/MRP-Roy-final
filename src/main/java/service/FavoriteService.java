@@ -5,8 +5,8 @@ import dao.MediaDao;
 import model.Favorite;
 
 public class FavoriteService {
-    private final FavoriteDao favoriteDao = new FavoriteDao();
-    private final MediaDao mediaDao = new MediaDao();
+    protected FavoriteDao favoriteDao = new FavoriteDao();
+    protected MediaDao mediaDao = new MediaDao();
 
     /**
      * Fügt ein Medium zu den Favoriten eines Benutzers hinzu.

@@ -5,8 +5,8 @@ import dao.MediaDao;
 import model.Rating;
 
 public class RatingService {
-    private final RatingDao ratingDao = new RatingDao();
-    private final MediaDao mediaDao = new MediaDao();
+    protected RatingDao ratingDao = new RatingDao();
+    protected MediaDao mediaDao = new MediaDao();
 
     /**
      * Erstellt eine neue Bewertung.

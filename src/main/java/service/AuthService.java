@@ -5,9 +5,9 @@ import model.User;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AuthService {
-    private final UserDao userDao = new UserDao();
+    protected UserDao userDao = new UserDao();
 
-    private static final ConcurrentHashMap<String, String> tokenRegistry = new ConcurrentHashMap<>();
+    protected static final ConcurrentHashMap<String, String> tokenRegistry = new ConcurrentHashMap<>();
 
     /**
      */

@@ -11,10 +11,10 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserService {
-    private final UserDao userDao = new UserDao();
-    private final RatingDao ratingDao = new RatingDao();
-    private final FavoriteDao favoriteDao = new FavoriteDao();
-    private final MediaDao mediaDao = new MediaDao();
+    protected UserDao userDao = new UserDao();
+    protected RatingDao ratingDao = new RatingDao();
+    protected FavoriteDao favoriteDao = new FavoriteDao();
+    protected MediaDao mediaDao = new MediaDao();
 
     private static final ConcurrentHashMap<String, String> tokenToUsername = new ConcurrentHashMap<>();
 

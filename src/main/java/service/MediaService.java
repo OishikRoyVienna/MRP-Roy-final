@@ -5,7 +5,7 @@ import model.MediaEntry;
 import java.util.List;
 
 public class MediaService {
-    private final MediaDao mediaDao = new MediaDao();
+    protected MediaDao mediaDao = new MediaDao();
 
     public MediaEntry create(MediaEntry entry) {
         return mediaDao.insert(entry);
