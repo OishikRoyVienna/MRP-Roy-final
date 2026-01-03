@@ -2,6 +2,10 @@
 echo "🚀 Starting MRP Final Test Suite..."
 echo
 
+# 🔁 1. DB zurücksetzen (sicherstellen: leerer Zustand)
+echo "1. Reset database..."
+curl -s -X POST http://localhost:8080/api/reset > /dev/null
+
 # 1. Register
 echo "1. Register user 'alice'..."
 curl -s -X POST http://localhost:8080/api/users/register \
@@ -14,7 +18,7 @@ echo "2. Login user 'alice'..."
 RESP=$(curl -s -X POST http://localhost:8080/api/users/login \
   -H "Content-Type: application/json" \
   -d '{"username":"alice","password":"123"}')
-TOKEN=$(echo "$RESP" | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+TOKEN=$(echo "$RESP" | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
 echo "Token: $TOKEN"
 echo
 
@@ -28,35 +32,31 @@ RESP=$(curl -s -X POST http://localhost:8080/api/media \
     "mediaType": "movie",
     "creatorUsername": "alice"
   }')
-MEDIA_ID=$(echo "$RESP" | grep -o '"id":[0-9]*' | cut -d':' -f2)
+MEDIA_ID=$(echo "$RESP" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
 echo "Media ID: $MEDIA_ID"
 echo
 
 # 4. Rate media
 echo "4. Rate media..."
-curl -s -X POST http://localhost:8080/api/ratings \
+curl -s -X POST "http://localhost:8080/api/media/$MEDIA_ID/ratings" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d "{
-    \"mediaId\": $MEDIA_ID,
-    \"stars\": 5,
-    \"comment\": \"Great movie!\"
-  }"
+  -d '{"stars":5,"comment":"Great!"}'
 echo
 
-# 5. Get ratings (unconfirmed → leer)
+# 5. Get ratings (unconfirmed)
 echo "5. Get ratings (unconfirmed)..."
 curl -s "http://localhost:8080/api/media/$MEDIA_ID/ratings?confirmed=false"
 echo
 
-# 6. Confirm rating (als Creator: 'alice')
+# 6. Confirm rating
 echo "6. Confirm rating..."
-RATING_ID=$(curl -s "http://localhost:8080/api/media/$MEDIA_ID/ratings?confirmed=false" | jq -r '.[0].id // "1"')
+RATING_ID=$(curl -s "http://localhost:8080/api/media/$MEDIA_ID/ratings?confirmed=false" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')
 curl -s -X PUT "http://localhost:8080/api/ratings/$RATING_ID/confirm" \
   -H "Authorization: Bearer $TOKEN"
 echo
 
-# 7. Get ratings (confirmed → sichtbar)
+# 7. Get ratings (confirmed)
 echo "7. Get ratings (confirmed)..."
 curl -s "http://localhost:8080/api/media/$MEDIA_ID/ratings?confirmed=true"
 echo
@@ -74,6 +74,7 @@ echo
 
 # 10. Get profile
 echo "10. Get profile..."
-curl -s "http://localhost:8080/api/users/alice/profile"
+curl -s "http://localhost:8080/api/users/alice/profile" \
+  -H "Authorization: Bearer $TOKEN"
 echo
 echo "🎉 Test suite completed!"

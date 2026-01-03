@@ -15,34 +15,24 @@ public class Application {
     private final RatingHandler ratingHandler = new RatingHandler();
     private final FavoriteHandler favoriteHandler = new FavoriteHandler();
 
+    // Ersetze die gesamte handle()-Methode durch:
     public Response handle(Request request) {
         String path = request.getPath();
 
-        // 1. /api/users/...
         if (path.startsWith("/api/users")) {
             return userHandler.handle(request);
         }
-
-        // 2. /api/media/...
         if (path.startsWith("/api/media")) {
             return mediaHandler.handle(request);
         }
-
-        // 3. /api/ratings/...  ODER  /api/media/.../ratings → beide an RatingHandler
-        if (path.startsWith("/api/ratings") || path.contains("/ratings")) {
+        if (path.startsWith("/api/ratings") || path.contains("/ratings")) { // ✅ Korrektur
             return ratingHandler.handle(request);
         }
-
-        // 4. /api/favorites/...
-        if (path.startsWith("/api/favorites")) {
+        if (path.startsWith("/api/favorites") || path.contains("/favorites")) { // ✅ Korrektur
             return favoriteHandler.handle(request);
         }
 
-        // 5. Fallback
-        return new Response(
-                Status.NOT_FOUND,
-                ContentType.APPLICATION_JSON,
-                "{\"error\":\"Endpoint not found\"}"
-        );
+        return new Response(Status.NOT_FOUND, ContentType.APPLICATION_JSON,
+                "{\"error\":\"Endpoint not found\"}");
     }
 }
