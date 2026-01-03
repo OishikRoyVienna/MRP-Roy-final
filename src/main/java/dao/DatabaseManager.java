@@ -46,6 +46,7 @@ public class DatabaseManager {
                                 is_confirmed BOOLEAN DEFAULT false
                             );
                             """);
+
                     }
                 }
             }
