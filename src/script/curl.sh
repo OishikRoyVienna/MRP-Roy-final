@@ -1,64 +1,79 @@
 #!/bin/bash
-URL="http://localhost:8080"
-
 echo "🚀 Starting MRP Final Test Suite..."
 echo
 
-# 1. Register & Login
+# 1. Register
 echo "1. Register user 'alice'..."
-curl -s -X POST "$URL/api/users/register" \
+curl -s -X POST http://localhost:8080/api/users/register \
   -H "Content-Type: application/json" \
-  -d '{"username":"alice","password":"secure123"}'
-
+  -d '{"username":"alice","password":"123"}'
 echo
+
+# 2. Login
 echo "2. Login user 'alice'..."
-TOKEN=$(curl -s -X POST "$URL/api/users/login" \
+RESP=$(curl -s -X POST http://localhost:8080/api/users/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"alice","password":"secure123"}' | jq -r '.token')
+  -d '{"username":"alice","password":"123"}')
+TOKEN=$(echo "$RESP" | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
 echo "Token: $TOKEN"
 echo
 
-# 2. Create Media
+# 3. Create media
 echo "3. Create media 'Inception'..."
-MEDIA_ID=$(curl -s -X POST "$URL/api/media" \
+RESP=$(curl -s -X POST http://localhost:8080/api/media \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"title":"Inception","mediaType":"movie","genres":["sci-fi","action"],"ageRestriction":12}' | jq -r '.id')
+  -d '{
+    "title": "Inception",
+    "mediaType": "movie",
+    "creatorUsername": "alice"
+  }')
+MEDIA_ID=$(echo "$RESP" | grep -o '"id":[0-9]*' | cut -d':' -f2)
 echo "Media ID: $MEDIA_ID"
 echo
 
-# 3. Rate & Confirm
+# 4. Rate media
 echo "4. Rate media..."
-curl -s -X POST "$URL/api/media/$MEDIA_ID/ratings" \
+curl -s -X POST http://localhost:8080/api/ratings \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"stars":5,"comment":"Mind-blowing!"}'
-
+  -d "{
+    \"mediaId\": $MEDIA_ID,
+    \"stars\": 5,
+    \"comment\": \"Great movie!\"
+  }"
 echo
-echo "5. Get ratings (should be empty – not confirmed)..."
-curl -s "$URL/api/media/$MEDIA_ID/ratings"
 
+# 5. Get ratings (unconfirmed → leer)
+echo "5. Get ratings (unconfirmed)..."
+curl -s "http://localhost:8080/api/media/$MEDIA_ID/ratings?confirmed=false"
 echo
+
+# 6. Confirm rating (als Creator: 'alice')
 echo "6. Confirm rating..."
-RATING_ID=$(curl -s "$URL/api/media/$MEDIA_ID/ratings" -H "Authorization: Bearer $TOKEN" | jq -r '.[0].id')
-curl -s -X PUT "$URL/api/ratings/$RATING_ID/confirm" -H "Authorization: Bearer $TOKEN"
-
-echo
-echo "7. Get ratings (now visible)..."
-curl -s "$URL/api/media/$MEDIA_ID/ratings"
+RATING_ID=$(curl -s "http://localhost:8080/api/media/$MEDIA_ID/ratings?confirmed=false" | jq -r '.[0].id // "1"')
+curl -s -X PUT "http://localhost:8080/api/ratings/$RATING_ID/confirm" \
+  -H "Authorization: Bearer $TOKEN"
 echo
 
-# 4. Favorites & Profile
+# 7. Get ratings (confirmed → sichtbar)
+echo "7. Get ratings (confirmed)..."
+curl -s "http://localhost:8080/api/media/$MEDIA_ID/ratings?confirmed=true"
+echo
+
+# 8. Add to favorites
 echo "8. Add to favorites..."
-curl -s -X POST "$URL/api/favorites/$MEDIA_ID" -H "Authorization: Bearer $TOKEN"
-
+curl -s -X POST "http://localhost:8080/api/favorites/$MEDIA_ID" \
+  -H "Authorization: Bearer $TOKEN"
 echo
+
+# 9. Get favorites
 echo "9. Get favorites..."
-curl -s -H "Authorization: Bearer $TOKEN" "$URL/api/favorites"
-
+curl -s "http://localhost:8080/api/users/alice/favorites"
 echo
-echo "10. Get profile..."
-curl -s -H "Authorization: Bearer $TOKEN" "$URL/api/users/alice/profile"
 
+# 10. Get profile
+echo "10. Get profile..."
+curl -s "http://localhost:8080/api/users/alice/profile"
 echo
 echo "🎉 Test suite completed!"

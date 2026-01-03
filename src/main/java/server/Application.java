@@ -4,8 +4,6 @@ import handler.FavoriteHandler;
 import handler.RatingHandler;
 import handler.UserHandler;
 import handler.MediaHandler;
-
-
 import http.ContentType;
 import http.Request;
 import http.Response;
@@ -18,20 +16,29 @@ public class Application {
     private final FavoriteHandler favoriteHandler = new FavoriteHandler();
 
     public Response handle(Request request) {
-        // Routing: Wer ist zuständig?
-        if (request.getPath().startsWith("/api/users")) {
+        String path = request.getPath();
+
+        // 1. /api/users/...
+        if (path.startsWith("/api/users")) {
             return userHandler.handle(request);
         }
-        if (request.getPath().startsWith("/api/media")) {
+
+        // 2. /api/media/...
+        if (path.startsWith("/api/media")) {
             return mediaHandler.handle(request);
         }
-        if (request.getPath().startsWith("/api/ratings") ||
-                request.getPath().matches("/api/media/\\d+/ratings")) {
+
+        // 3. /api/ratings/...  ODER  /api/media/.../ratings → beide an RatingHandler
+        if (path.startsWith("/api/ratings") || path.contains("/ratings")) {
             return ratingHandler.handle(request);
         }
-        if (request.getPath().startsWith("/api/favorites")) {
+
+        // 4. /api/favorites/...
+        if (path.startsWith("/api/favorites")) {
             return favoriteHandler.handle(request);
         }
+
+        // 5. Fallback
         return new Response(
                 Status.NOT_FOUND,
                 ContentType.APPLICATION_JSON,

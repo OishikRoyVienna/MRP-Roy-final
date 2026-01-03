@@ -13,11 +13,11 @@ public class MediaService {
         return mediaDao.insert(entry);
     }
 
-    // ✅ Nur EINE getById-Methode – mit averageRating
+    //Nur EINE getById-Methode – mit averageRating
     public MediaEntry getById(int id) {
         MediaEntry entry = mediaDao.findById(id);
         if (entry != null) {
-            // ✅ Durchschnitt aus RatingDao holen
+            //durchschnitt aus RatingDao holen
             Double avg = ratingDao.getAverageRating(id);  // nutzt das Feld oben
             entry.setAverageRating(avg);
         }
