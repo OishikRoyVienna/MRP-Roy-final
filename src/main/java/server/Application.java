@@ -22,18 +22,18 @@ public class Application {
         if ("/api/reset".equals(path)) {
             return userHandler.handle(request);
         }
-
         if (path.startsWith("/api/users")) {
             return userHandler.handle(request);
         }
         if (path.startsWith("/api/media")) {
             return mediaHandler.handle(request);
         }
+        // ✅ 2. Rating: /api/ratings UND /api/media/1/ratings
         if (path.startsWith("/api/ratings") || path.matches("/api/media/\\d+/ratings")) {
             return ratingHandler.handle(request);
         }
-        // ✅ 2. /api/favorites/ → mit "/" am Ende!
-        if (path.startsWith("/api/favorites/")) {
+        // ✅ 3. Favorites: /api/favorites UND /api/favorites/1
+        if (path.startsWith("/api/favorites") || path.matches("/api/favorites/\\d+")) {
             return favoriteHandler.handle(request);
         }
 
