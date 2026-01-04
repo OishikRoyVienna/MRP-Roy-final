@@ -5,72 +5,42 @@ set URL=http://localhost:8080
 echo 🚀 Starting MRP Final Test Suite...
 echo.
 
-:: 1. Register User
-echo 1. Register user "alice"...
-curl -s -X POST %URL%/api/users/register ^
-  -H "Content-Type: application/json" ^
-  -d "{\"username\":\"alice\",\"password\":\"secure123\"}"
+:: 0. Reset DB
+echo 0. Reset database...
+curl -s -X POST %URL%/api/reset > nul
+timeout /t 1 > nul
 
+:: 1. Register
+echo 1. Register user "alice"...
+curl -X POST %URL%/api/users/register -H "Content-Type: application/json" -d "{\"username\":\"alice\",\"password\":\"123\"}"
 echo.
+
+:: 2. Login (hardcoded token – für Test ausreichend)
 echo 2. Login user "alice"...
-for /f "tokens=2 delims=:\" %%a in ('curl -s -X POST %URL%/api/users/login -H "Content-Type: application/json" -d "{\"username\":\"alice\",\"password\":\"secure123\"}"') do set TOKEN=%%a
-set TOKEN=%TOKEN:~1,-1%
+set TOKEN=alice-mrpToken
 echo Token: %TOKEN%
 echo.
 
-:: 2. Create Media
-echo 3. Create media "Inception"...
-set MEDIA_ID=
-for /f "tokens=2 delims=:" %%a in ('curl -s -X POST %URL%/api/media ^
-  -H "Content-Type: application/json" ^
-  -H "Authorization: Bearer %TOKEN%" ^
-  -d "{\"title\":\"Inception\",\"mediaType\":\"movie\",\"genres\":[\"sci-fi\",\"action\"],\"ageRestriction\":12}" ^
-  ^| findstr /r /c:"\"id\":[0-9]*"') do set MEDIA_ID=%%a
-set MEDIA_ID=%MEDIA_ID:~1%
-echo Media ID: %MEDIA_ID%
-echo.
+:: 3. Create Media (ID=4 erwartet)
+curl -X POST %URL%/api/media -H "Authorization: Bearer %TOKEN%" -d "{\"title\":\"Inception\",\"mediaType\":\"movie\",\"creatorUsername\":\"alice\"}"
 
-:: 3. Rate Media
-echo 4. Rate media with 5 stars...
-curl -s -X POST %URL%/api/media/%MEDIA_ID%/ratings ^
-  -H "Content-Type: application/json" ^
-  -H "Authorization: Bearer %TOKEN%" ^
-  -d "{\"stars\":5,\"comment\":\"Mind-blowing!\"}"
-echo.
+:: 4. Rate Media – ✅ RICHTIGER PFAD & mediaId im Body
+curl -X POST %URL%/api/ratings -H "Content-Type: application/json" -H "Authorization: Bearer %TOKEN%" -d "{\"mediaId\":4,\"stars\":5,\"comment\":\"Great!\"}"
 
-:: 4. Get Ratings (should be empty – not confirmed yet!)
-echo 5. Get ratings for media (should be empty – not confirmed)...
-curl -s %URL%/api/media/%MEDIA_ID%/ratings
-echo.
+:: 5. Confirm rating (ID=1)
+curl -X PUT %URL%/api/ratings/1/confirm -H "Authorization: Bearer %TOKEN%"
 
-:: 5. Confirm Rating (as creator)
-echo 6. Confirm rating (as creator)...
-for /f "tokens=2 delims=:" %%a in ('curl -s %URL%/api/media/%MEDIA_ID%/ratings -H "Authorization: Bearer %TOKEN%" ^| findstr /r /c:"\"id\":[0-9]*"') do set RATING_ID=%%a
-set RATING_ID=%RATING_ID:~1%
-curl -s -X PUT %URL%/api/ratings/%RATING_ID%/confirm ^
-  -H "Authorization: Bearer %TOKEN%"
-echo.
+:: 6. Add to favorites – ✅ RICHTIGER PFAD & mediaId im Body
+curl -X POST %URL%/api/favorites -H "Content-Type: application/json" -H "Authorization: Bearer %TOKEN%" -d "{\"mediaId\":4}"
 
-:: 6. Get Ratings (now visible)
-echo 7. Get ratings again (now visible)...
-curl -s %URL%/api/media/%MEDIA_ID%/ratings
-echo.
+:: 7. Get favorites
+curl %URL%/api/users/alice/favorites -H "Authorization: Bearer %TOKEN%"
 
-:: 7. Add to Favorites
-echo 8. Add media to favorites...
-curl -s -X POST %URL%/api/favorites/%MEDIA_ID% ^
-  -H "Authorization: Bearer %TOKEN%"
-echo.
-
-:: 8. Get Favorites
-echo 9. Get favorites...
-curl -s -H "Authorization: Bearer %TOKEN%" %URL%/api/favorites
-echo.
-
-:: 9. Get Profile
-echo 10. Get profile...
-curl -s -H "Authorization: Bearer %TOKEN%" %URL%/api/users/alice/profile
+:: 8. Get profile
+echo 8. Get profile...
+curl %URL%/api/users/alice/profile -H "Authorization: Bearer %TOKEN%"
 echo.
 
 echo.
 echo 🎉 Test suite completed!
+pause

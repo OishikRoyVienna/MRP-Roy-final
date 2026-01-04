@@ -15,9 +15,13 @@ public class Application {
     private final RatingHandler ratingHandler = new RatingHandler();
     private final FavoriteHandler favoriteHandler = new FavoriteHandler();
 
-    // Ersetze die gesamte handle()-Methode durch:
     public Response handle(Request request) {
         String path = request.getPath();
+
+        // ✅ 1. /api/reset zuerst!
+        if ("/api/reset".equals(path)) {
+            return userHandler.handle(request);
+        }
 
         if (path.startsWith("/api/users")) {
             return userHandler.handle(request);
@@ -25,10 +29,11 @@ public class Application {
         if (path.startsWith("/api/media")) {
             return mediaHandler.handle(request);
         }
-        if (path.startsWith("/api/ratings") || path.contains("/ratings")) { // ✅ Korrektur
+        if (path.startsWith("/api/ratings") || path.matches("/api/media/\\d+/ratings")) {
             return ratingHandler.handle(request);
         }
-        if (path.startsWith("/api/favorites") || path.contains("/favorites")) { // ✅ Korrektur
+        // ✅ 2. /api/favorites/ → mit "/" am Ende!
+        if (path.startsWith("/api/favorites/")) {
             return favoriteHandler.handle(request);
         }
 

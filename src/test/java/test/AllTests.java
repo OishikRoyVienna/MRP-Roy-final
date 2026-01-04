@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.*;
 
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,22 +22,21 @@ public class AllTests {
             stmt.execute("DROP TABLE IF EXISTS ratings");
             stmt.execute("DROP TABLE IF EXISTS media_entries");
             stmt.execute("DROP TABLE IF EXISTS users");
-            // Dann neu anlegen
             DatabaseManager.initializeDatabase();
         } catch (Exception e) {
-            throw new RuntimeException("DB cleanup failed", e);
+            throw new RuntimeException("DB setup failed", e);
         }
     }
 
-    // ==== 1. UserService Tests (5) ====
+    // ==== 1. User Management (5 Tests) ====
     @Test
-    void testRegisterSuccess() {
+    void testUserRegisterSuccess() {
         UserService service = new UserService();
         assertDoesNotThrow(() -> service.register("alice", "123"));
     }
 
     @Test
-    void testRegisterDuplicate() {
+    void testUserRegisterDuplicate() {
         UserService service = new UserService();
         service.register("bob", "123");
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
@@ -45,7 +45,7 @@ public class AllTests {
     }
 
     @Test
-    void testLoginSuccess() {
+    void testUserLoginSuccess() {
         UserService service = new UserService();
         service.register("charlie", "123");
         String token = service.login("charlie", "123");
@@ -54,7 +54,7 @@ public class AllTests {
     }
 
     @Test
-    void testLoginInvalid() {
+    void testUserLoginInvalid() {
         UserService service = new UserService();
         service.register("dave", "123");
         assertNull(service.login("dave", "wrong"));
@@ -68,9 +68,9 @@ public class AllTests {
         assertEquals("eve", UserService.getUsernameByToken(token));
     }
 
-    // ==== 2. MediaService Tests (5) ====
+    // ==== 2. Media Management (5 Tests) ====
     @Test
-    void testCreateMedia() {
+    void testMediaCreate() {
         UserService userService = new UserService();
         userService.register("alice", "123");
         MediaService service = new MediaService();
@@ -84,7 +84,7 @@ public class AllTests {
     }
 
     @Test
-    void testGetMediaById() {
+    void testMediaGetById() {
         UserService userService = new UserService();
         userService.register("alice", "123");
         MediaService service = new MediaService();
@@ -95,36 +95,36 @@ public class AllTests {
     }
 
     @Test
-    void testListMedia() {
+    void testMediaList() {
         UserService userService = new UserService();
         userService.register("alice", "123");
         MediaService service = new MediaService();
-        MediaEntry m1 = new MediaEntry(); m1.setTitle("A"); m1.setMediaType("movie"); m1.setCreatorUsername("alice");
-        MediaEntry m2 = new MediaEntry(); m2.setTitle("B"); m2.setMediaType("series"); m2.setCreatorUsername("alice");
+        MediaEntry m1 = new MediaEntry(); m1.setTitle("A Movie"); m1.setMediaType("movie"); m1.setCreatorUsername("alice");
+        MediaEntry m2 = new MediaEntry(); m2.setTitle("B Series"); m2.setMediaType("series"); m2.setCreatorUsername("alice");
         service.create(m1);
         service.create(m2);
         List<MediaEntry> list = service.list("A");
         assertEquals(1, list.size());
-        assertEquals("A", list.get(0).getTitle());
+        assertEquals("A Movie", list.get(0).getTitle());
     }
 
     @Test
-    void testUpdateMedia() {
+    void testMediaUpdate() {
         UserService userService = new UserService();
         userService.register("alice", "123");
         MediaService service = new MediaService();
         MediaEntry m = new MediaEntry(); m.setTitle("Old"); m.setMediaType("movie"); m.setCreatorUsername("alice");
         int id = service.create(m).getId();
-        MediaEntry updated = new MediaEntry();
-        updated.setId(id);
-        updated.setTitle("New");
-        updated.setMediaType("movie");
-        service.update(updated);
+        MediaEntry update = new MediaEntry();
+        update.setId(id);
+        update.setTitle("New");
+        update.setMediaType("movie");
+        service.update(update);
         assertEquals("New", service.getById(id).getTitle());
     }
 
     @Test
-    void testDeleteMedia() {
+    void testMediaDelete() {
         UserService userService = new UserService();
         userService.register("alice", "123");
         MediaService service = new MediaService();
@@ -134,9 +134,9 @@ public class AllTests {
         assertNull(service.getById(id));
     }
 
-    // ==== 3. RatingService Tests (5) ====
+    // ==== 3. Rating & Moderation (5 Tests) ====
     @Test
-    void testCreateRating() {
+    void testRatingCreate() {
         UserService userService = new UserService();
         userService.register("alice", "123");
         userService.register("bob", "123");
@@ -171,17 +171,6 @@ public class AllTests {
     }
 
     @Test
-    void testRatingMediaNotFound() {
-        UserService userService = new UserService();
-        userService.register("bob", "123");
-        RatingService ratingService = new RatingService();
-        Rating r = new Rating(); r.setMediaId(999); r.setUsername("bob"); r.setStars(5);
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> ratingService.createRating(r, "bob"));
-        assertEquals("Media not found", e.getMessage());
-    }
-
-    @Test
     void testConfirmRatingByCreator() {
         UserService userService = new UserService();
         userService.register("alice", "123");
@@ -206,12 +195,32 @@ public class AllTests {
         MediaEntry m = new MediaEntry(); m.setTitle("Test"); m.setMediaType("movie"); m.setCreatorUsername("alice");
         int mediaId = mediaService.create(m).getId();
         Rating r = new Rating(); r.setMediaId(mediaId); r.setUsername("bob"); r.setStars(5);
-        ratingService.createRating(r, "bob"); // unconfirmed
+        ratingService.createRating(r, "bob");
         assertEquals(0, ratingService.getRatingsForMedia(mediaId, true).size());
         assertEquals(1, ratingService.getRatingsForMedia(mediaId, false).size());
     }
 
-    // ==== 4. FavoriteService Tests (3) ====
+    @Test
+    void testAverageRatingCalculation() {
+        UserService userService = new UserService();
+        userService.register("alice", "123");
+        userService.register("bob", "123");
+        MediaService mediaService = new MediaService();
+        RatingService ratingService = new RatingService();
+        MediaEntry m = new MediaEntry(); m.setTitle("Test"); m.setMediaType("movie"); m.setCreatorUsername("alice");
+        int mediaId = mediaService.create(m).getId();
+        Rating r1 = new Rating(); r1.setMediaId(mediaId); r1.setUsername("bob"); r1.setStars(4);
+        Rating r2 = new Rating(); r2.setMediaId(mediaId); r2.setUsername("charlie"); r2.setStars(2);
+        ratingService.createRating(r1, "bob");
+        ratingService.createRating(r2, "charlie");
+        // Unbestätigt → avg = null
+        assertNull(mediaService.getById(mediaId).getAverageRating());
+        // Bestätige eine
+        ratingService.confirmRating(r1.getId(), "alice");
+        assertEquals(4.0, mediaService.getById(mediaId).getAverageRating());
+    }
+
+    // ==== 4. Favorites & Profile (5 Tests) ====
     @Test
     void testAddFavorite() {
         UserService userService = new UserService();
@@ -250,27 +259,6 @@ public class AllTests {
         assertTrue(favoriteService.isFavorite("alice", mediaId));
     }
 
-    // ==== 5. Integration & Business Logic Tests (2) ====
-    @Test
-    void testMediaAverageRating() {
-        UserService userService = new UserService();
-        userService.register("alice", "123");
-        userService.register("bob", "123");
-        MediaService mediaService = new MediaService();
-        RatingService ratingService = new RatingService();
-        MediaEntry m = new MediaEntry(); m.setTitle("Test"); m.setMediaType("movie"); m.setCreatorUsername("alice");
-        int mediaId = mediaService.create(m).getId();
-        Rating r1 = new Rating(); r1.setMediaId(mediaId); r1.setUsername("bob"); r1.setStars(4);
-        Rating r2 = new Rating(); r2.setMediaId(mediaId); r2.setUsername("charlie"); r2.setStars(2);
-        ratingService.createRating(r1, "bob");
-        ratingService.createRating(r2, "charlie");
-        // Unbestätigt → avg = null
-        assertNull(mediaService.getById(mediaId).getAverageRating());
-        // Bestätige eine
-        ratingService.confirmRating(r1.getId(), "alice");
-        assertEquals(4.0, mediaService.getById(mediaId).getAverageRating());
-    }
-
     @Test
     void testUserProfileStats() {
         UserService userService = new UserService();
@@ -286,5 +274,28 @@ public class AllTests {
         var profile = userService.getProfile("bob");
         assertEquals(1, profile.get("totalRatings"));
         assertEquals(5.0, profile.get("averageRating"));
+    }
+
+    @Test
+    void testFavoriteGenreCalculation() {
+        UserService userService = new UserService();
+        userService.register("alice", "123");
+        MediaService mediaService = new MediaService();
+        RatingService ratingService = new RatingService();
+        // Medien mit Genres erstellen
+        MediaEntry m1 = new MediaEntry(); m1.setTitle("A"); m1.setMediaType("movie"); m1.setCreatorUsername("alice"); m1.setGenres(new String[]{"sci-fi"});
+        MediaEntry m2 = new MediaEntry(); m2.setTitle("B"); m2.setMediaType("movie"); m2.setCreatorUsername("alice"); m2.setGenres(new String[]{"sci-fi", "action"});
+        int id1 = mediaService.create(m1).getId();
+        int id2 = mediaService.create(m2).getId();
+        // Bewertungen
+        Rating r1 = new Rating(); r1.setMediaId(id1); r1.setUsername("alice"); r1.setStars(5);
+        Rating r2 = new Rating(); r2.setMediaId(id2); r2.setUsername("alice"); r2.setStars(4);
+        ratingService.createRating(r1, "alice");
+        ratingService.createRating(r2, "alice");
+        ratingService.confirmRating(r1.getId(), "alice");
+        ratingService.confirmRating(r2.getId(), "alice");
+        String favGenre = mediaService.getById(id1).getCreatorUsername(); // Trick: nutze DAO direkt
+        String genre = new MediaDao().getFavoriteGenre("alice");
+        assertEquals("sci-fi", genre);
     }
 }

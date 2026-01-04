@@ -58,15 +58,6 @@ public class DatabaseManager {
                                 PRIMARY KEY (username, media_id)
                             );
                             """);
-
-                        // ✅ 4. favorites – FEHLTET BISHER
-                        stmt.execute("""
-                            CREATE TABLE favorites (
-                                username VARCHAR(50) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
-                                media_id INTEGER NOT NULL REFERENCES media_entries(id) ON DELETE CASCADE,
-                                PRIMARY KEY (username, media_id)
-                            );
-                            """);
                     }
                 }
             }

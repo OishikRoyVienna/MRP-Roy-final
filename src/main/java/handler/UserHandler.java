@@ -1,5 +1,6 @@
 package handler;
 
+import dao.DatabaseManager;
 import http.Request;
 import http.Response;
 import http.Status;
@@ -40,24 +41,21 @@ public class UserHandler {
                 "{\"error\":\"Invalid request\"}");
     }
 
-    // ✅ Reset-Endpoint – löscht und initialisiert DB neu
     private Response handleReset() {
         try {
-            // Tabellen in korrekter Reihenfolge löschen
-            try (var conn = dao.DatabaseManager.getConnection();
+            try (var conn = DatabaseManager.getConnection();
                  var stmt = conn.createStatement()) {
                 stmt.execute("DROP TABLE IF EXISTS favorites");
                 stmt.execute("DROP TABLE IF EXISTS ratings");
                 stmt.execute("DROP TABLE IF EXISTS media_entries");
                 stmt.execute("DROP TABLE IF EXISTS users");
             }
-            // Neu anlegen
-            dao.DatabaseManager.initializeDatabase();
+            DatabaseManager.initializeDatabase();
             return new Response(Status.OK, ContentType.APPLICATION_JSON,
                     "{\"message\":\"DB reset\"}");
         } catch (Exception e) {
             return new Response(Status.INTERNAL_SERVER_ERROR, ContentType.APPLICATION_JSON,
-                    "{\"error\":\"Reset failed: " + e.getMessage() + "\"}");
+                    "{\"error\":\"Reset failed\"}");
         }
     }
 

@@ -9,9 +9,6 @@ public class MediaService {
     protected MediaDao mediaDao = new MediaDao();
     protected RatingDao ratingDao = new RatingDao(); // ✅ Feld hinzufügen (optional, aber sauberer)
 
-    public MediaEntry create(MediaEntry entry) {
-        return mediaDao.insert(entry);
-    }
 
     //Nur EINE getById-Methode – mit averageRating
     public MediaEntry getById(int id) {
@@ -22,6 +19,10 @@ public class MediaService {
             entry.setAverageRating(avg);
         }
         return entry;
+    }
+
+    public MediaEntry create(MediaEntry entry) {
+        return mediaDao.insert(entry);
     }
 
     public List<MediaEntry> list(String titleFilter) {
