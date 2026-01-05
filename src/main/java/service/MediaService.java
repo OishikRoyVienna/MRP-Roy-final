@@ -9,13 +9,12 @@ public class MediaService {
     protected MediaDao mediaDao = new MediaDao();
     protected RatingDao ratingDao = new RatingDao(); // optional, aber sauber
 
-    // 🔥 NEU: 5-Parameter-Version → benötigt für Filter
+    //5-Parameter-Version → benötigt für Filter
     public List<MediaEntry> list(String titleFilter, String genre, String mediaType,
                                  Integer minAge, Double minRating) {
         return mediaDao.findAll(titleFilter, genre, mediaType, minAge, minRating);
     }
 
-    // 👇 Rückwärtskompatibel: alte Signatur delegiert weiterhin
     public List<MediaEntry> list(String titleFilter) {
         return list(titleFilter, null, null, null, null);
     }
