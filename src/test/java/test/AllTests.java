@@ -5,10 +5,7 @@ import model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.*;
-
-import java.time.Instant;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AllTests {
@@ -17,11 +14,12 @@ public class AllTests {
     void cleanDB() {
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.createStatement()) {
-            // Tabellen in korrekter Reihenfolge löschen (Foreign Keys!)
-            stmt.execute("DROP TABLE IF EXISTS favorites");
-            stmt.execute("DROP TABLE IF EXISTS ratings");
-            stmt.execute("DROP TABLE IF EXISTS media_entries");
-            stmt.execute("DROP TABLE IF EXISTS users");
+            // 🔥 DROP in korrekter Reihenfolge mit CASCADE (verhindert Abhängigkeitsfehler!)
+            stmt.execute("DROP TABLE IF EXISTS likes CASCADE");
+            stmt.execute("DROP TABLE IF EXISTS favorites CASCADE");
+            stmt.execute("DROP TABLE IF EXISTS ratings CASCADE");
+            stmt.execute("DROP TABLE IF EXISTS media_entries CASCADE");
+            stmt.execute("DROP TABLE IF EXISTS users CASCADE");
             DatabaseManager.initializeDatabase();
         } catch (Exception e) {
             throw new RuntimeException("DB setup failed", e);
@@ -29,6 +27,7 @@ public class AllTests {
     }
 
     // ==== 1. User Management (5 Tests) ====
+
     @Test
     void testUserRegisterSuccess() {
         UserService service = new UserService();
@@ -69,6 +68,7 @@ public class AllTests {
     }
 
     // ==== 2. Media Management (5 Tests) ====
+
     @Test
     void testMediaCreate() {
         UserService userService = new UserService();
@@ -135,6 +135,7 @@ public class AllTests {
     }
 
     // ==== 3. Rating & Moderation (5 Tests) ====
+
     @Test
     void testRatingCreate() {
         UserService userService = new UserService();
@@ -221,6 +222,7 @@ public class AllTests {
     }
 
     // ==== 4. Favorites & Profile (5 Tests) ====
+
     @Test
     void testAddFavorite() {
         UserService userService = new UserService();
@@ -294,7 +296,6 @@ public class AllTests {
         ratingService.createRating(r2, "alice");
         ratingService.confirmRating(r1.getId(), "alice");
         ratingService.confirmRating(r2.getId(), "alice");
-        String favGenre = mediaService.getById(id1).getCreatorUsername(); // Trick: nutze DAO direkt
         String genre = new MediaDao().getFavoriteGenre("alice");
         assertEquals("sci-fi", genre);
     }

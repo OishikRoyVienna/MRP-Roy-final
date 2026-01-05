@@ -12,9 +12,7 @@ public class DatabaseManager {
             DatabaseMetaData meta = conn.getMetaData();
             try (ResultSet rs = meta.getTables(null, null, "users", new String[]{"TABLE"})) {
                 if (!rs.next()) {
-                    // Tabellen in korrekter Reihenfolge (Foreign Keys!)
                     try (Statement stmt = conn.createStatement()) {
-                        // 1. users
                         stmt.execute("""
                             CREATE TABLE users (
                                 id SERIAL PRIMARY KEY,
@@ -23,7 +21,6 @@ public class DatabaseManager {
                             );
                             """);
 
-                        // 2. media_entries
                         stmt.execute("""
                             CREATE TABLE media_entries (
                                 id SERIAL PRIMARY KEY,
@@ -37,7 +34,6 @@ public class DatabaseManager {
                             );
                             """);
 
-                        // 3. ratings
                         stmt.execute("""
                             CREATE TABLE ratings (
                                 id SERIAL PRIMARY KEY,
@@ -50,12 +46,20 @@ public class DatabaseManager {
                             );
                             """);
 
-                        // In DatabaseManager.initializeDatabase(), nach ratings:
                         stmt.execute("""
-                                CREATE TABLE favorites (
+                            CREATE TABLE favorites (
                                 username VARCHAR(50) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
                                 media_id INTEGER NOT NULL REFERENCES media_entries(id) ON DELETE CASCADE,
                                 PRIMARY KEY (username, media_id)
+                            );
+                            """);
+
+                        //likes-Tabelle für Like-Funktion
+                        stmt.execute("""
+                            CREATE TABLE likes (
+                                username VARCHAR(50) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
+                                rating_id INTEGER NOT NULL REFERENCES ratings(id) ON DELETE CASCADE,
+                                PRIMARY KEY (username, rating_id)
                             );
                             """);
                     }

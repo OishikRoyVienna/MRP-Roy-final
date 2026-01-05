@@ -39,25 +39,66 @@ public class MediaDao {
         return null;
     }
 
-    public List<MediaEntry> findAll(String titleFilter) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM media_entries");
-        if (titleFilter != null && !titleFilter.isEmpty()) {
-            sql.append(" WHERE title ILIKE ?");
+    // 👇 Neue Signatur: alle Filter-Optionen (empfohlen)
+    public List<MediaEntry> findAll(String titleFilter, String genre, String mediaType,
+                                    Integer minAge, Double minRating) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT m.*, COALESCE(AVG(r.stars), 0) AS average_rating " +
+                        "FROM media_entries m " +
+                        "LEFT JOIN ratings r ON m.id = r.media_id AND r.is_confirmed = true " +
+                        "WHERE 1=1"
+        );
+        List<Object> params = new ArrayList<>();
+
+        if (titleFilter != null && !titleFilter.trim().isEmpty()) {
+            sql.append(" AND m.title ILIKE ?");
+            params.add("%" + titleFilter.trim() + "%");
         }
+        if (genre != null && !genre.trim().isEmpty()) {
+            sql.append(" AND ? = ANY(m.genres)");
+            params.add(genre.trim());
+        }
+        if (mediaType != null && !mediaType.trim().isEmpty()) {
+            sql.append(" AND m.media_type = ?");
+            params.add(mediaType.trim());
+        }
+        if (minAge != null) {
+            sql.append(" AND m.age_restriction >= ?");
+            params.add(minAge);
+        }
+
+        sql.append(" GROUP BY m.id");
+
+        if (minRating != null) {
+            sql.append(" HAVING COALESCE(AVG(r.stars), 0) >= ?");
+            params.add(minRating);
+        }
+
+        sql.append(" ORDER BY m.title ASC");
+
         List<MediaEntry> list = new ArrayList<>();
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            if (titleFilter != null && !titleFilter.isEmpty()) {
-                ps.setString(1, "%" + titleFilter + "%");
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
             }
-            ResultSet rs = ps.executeQuery();
+
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                list.add(mapRow(rs));
+                MediaEntry m = mapRow(rs);
+                m.setAverageRating(rs.getDouble("average_rating"));
+                list.add(m);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
+    }
+
+    // 👇 Kompatibilität: alte Signatur weiterhin nutzbar (delegiert)
+    public List<MediaEntry> findAll(String titleFilter) {
+        return findAll(titleFilter, null, null, null, null);
     }
 
     public void update(MediaEntry m) {

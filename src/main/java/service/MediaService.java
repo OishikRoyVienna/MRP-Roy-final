@@ -7,26 +7,30 @@ import java.util.List;
 
 public class MediaService {
     protected MediaDao mediaDao = new MediaDao();
-    protected RatingDao ratingDao = new RatingDao(); // ✅ Feld hinzufügen (optional, aber sauberer)
+    protected RatingDao ratingDao = new RatingDao(); // optional, aber sauber
 
+    // 🔥 NEU: 5-Parameter-Version → benötigt für Filter
+    public List<MediaEntry> list(String titleFilter, String genre, String mediaType,
+                                 Integer minAge, Double minRating) {
+        return mediaDao.findAll(titleFilter, genre, mediaType, minAge, minRating);
+    }
 
-    //Nur EINE getById-Methode – mit averageRating
-    public MediaEntry getById(int id) {
-        MediaEntry entry = mediaDao.findById(id);
-        if (entry != null) {
-            //durchschnitt aus RatingDao holen
-            Double avg = ratingDao.getAverageRating(id);  // nutzt das Feld oben
-            entry.setAverageRating(avg);
-        }
-        return entry;
+    // 👇 Rückwärtskompatibel: alte Signatur delegiert weiterhin
+    public List<MediaEntry> list(String titleFilter) {
+        return list(titleFilter, null, null, null, null);
     }
 
     public MediaEntry create(MediaEntry entry) {
         return mediaDao.insert(entry);
     }
 
-    public List<MediaEntry> list(String titleFilter) {
-        return mediaDao.findAll(titleFilter);
+    public MediaEntry getById(int id) {
+        MediaEntry entry = mediaDao.findById(id);
+        if (entry != null) {
+            Double avg = ratingDao.getAverageRating(id);
+            entry.setAverageRating(avg);
+        }
+        return entry;
     }
 
     public void update(MediaEntry entry) {

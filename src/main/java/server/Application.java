@@ -18,7 +18,7 @@ public class Application {
     public Response handle(Request request) {
         String path = request.getPath();
 
-        // ✅ 1. /api/reset zuerst!
+        //1. /api/reset zuerst!
         if ("/api/reset".equals(path)) {
             return userHandler.handle(request);
         }
@@ -28,11 +28,11 @@ public class Application {
         if (path.startsWith("/api/media")) {
             return mediaHandler.handle(request);
         }
-        // ✅ 2. Rating: /api/ratings UND /api/media/1/ratings
+        //2. Rating: /api/ratings UND /api/media/1/ratings
         if (path.startsWith("/api/ratings") || path.matches("/api/media/\\d+/ratings")) {
             return ratingHandler.handle(request);
         }
-        // ✅ 3. Favorites: /api/favorites UND /api/favorites/1
+        //3. Favorites: /api/favorites UND /api/favorites/1
         if (path.startsWith("/api/favorites") || path.matches("/api/favorites/\\d+")) {
             return favoriteHandler.handle(request);
         }

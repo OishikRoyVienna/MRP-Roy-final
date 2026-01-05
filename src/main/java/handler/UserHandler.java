@@ -16,27 +16,27 @@ public class UserHandler {
         String path = request.getPath();
         String method = request.getMethod();
 
-        // ✅ 1. /api/reset (MUST-HAVE für Tests)
+        //1. /api/reset (MUST-HAVE für Tests)
         if ("POST".equals(method) && "/api/reset".equals(path)) {
             return handleReset();
         }
 
-        // ✅ 2. /api/users/register
+        //2. /api/users/register
         if ("POST".equals(method) && "/api/users/register".equals(path)) {
             return handleRegister(request);
         }
 
-        // ✅ 3. /api/users/login
+        //3. /api/users/login
         if ("POST".equals(method) && "/api/users/login".equals(path)) {
             return handleLogin(request);
         }
 
-        // ✅ 4. /api/users/{username}/profile
+        //4. /api/users/{username}/profile
         if ("GET".equals(method) && path.matches("/api/users/[^/]+/profile")) {
             return handleProfile(request);
         }
 
-        // ❌ Fallback
+        //Fallback
         return new Response(Status.BAD_REQUEST, ContentType.APPLICATION_JSON,
                 "{\"error\":\"Invalid request\"}");
     }

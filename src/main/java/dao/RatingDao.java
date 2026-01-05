@@ -21,8 +21,7 @@ public class RatingDao {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 rating.setId(rs.getInt("id"));
-                rating.setTimestamp(rs.getTimestamp("timestamp").toInstant());
-            }
+                rating.setTimestamp(rs.getTimestamp("timestamp").toInstant().toString());            }
             return rating;
         } catch (SQLException e) {  // ✅ SQLException statt Exception
             throw new RuntimeException("Failed to insert rating", e);
@@ -84,8 +83,7 @@ public class RatingDao {
         r.setStars(rs.getInt("stars"));
         r.setComment(rs.getString("comment"));
         r.setConfirmed(rs.getBoolean("is_confirmed"));
-        r.setTimestamp(rs.getTimestamp("timestamp").toInstant());
-        return r;
+        r.setTimestamp(rs.getTimestamp("timestamp").toInstant().toString());        return r;
     }
 
     /**
