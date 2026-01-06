@@ -87,6 +87,6 @@ curl -X DELETE http://localhost:8080/api/ratings/1 ^
   -H "Authorization: Bearer alice-mrpToken"
 echo.
 
-echo 🎉 Test suite completed successfully.
+echo 🎉 Test suite completed successfully. 🎉
 echo.
 pause

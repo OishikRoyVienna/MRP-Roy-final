@@ -44,7 +44,6 @@ public class FavoriteDao {
         return ids;
     }
 
-    // In deiner FavoriteDao.java:
     public boolean isFavorite(String username, int mediaId) {
         String sql = "SELECT 1 FROM favorites WHERE username = ? AND media_id = ?";
         try (Connection conn = DatabaseManager.getConnection();

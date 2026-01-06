@@ -10,16 +10,13 @@ public class Rating {
     private String comment;
     private boolean confirmed;
 
-    // ✅ ÄNDERUNG: String statt Instant
-    private String timestamp;  // ← war: Instant
+    private String timestamp;
 
     public Rating() {
-        // ✅ ISO-String statt Instant.now()
         this.timestamp = Instant.now().toString();  // z. B. "2026-01-06T10:30:45.123Z"
         this.confirmed = false;
     }
 
-    // --- Getter & Setter (angepasst) ---
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -45,7 +42,6 @@ public class Rating {
     public String getTimestamp() { return timestamp; }
     public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
 
-    // Optional: Hilfsmethode, falls du später Instant brauchst
     public Instant getTimestampAsInstant() {
         return timestamp != null ? Instant.parse(timestamp) : null;
     }

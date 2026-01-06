@@ -52,7 +52,7 @@ public class RatingService {
         return ratingDao.findByMediaId(mediaId, onlyConfirmed);
     }
 
-    // 🔥 NEU: Edit eigene Bewertung
+    //Edit eigene Bewertung
     public void updateRating(Rating rating, String requester) {
         Rating existing = ratingDao.findById(rating.getId());
         if (existing == null) throw new IllegalArgumentException("Rating not found");
@@ -71,7 +71,7 @@ public class RatingService {
         }
     }
 
-    // 🔥 NEU: Delete eigene Bewertung
+    //Delete eigene Bewertung
     public void deleteRating(int id, String requester) {
         Rating existing = ratingDao.findById(id);
         if (existing == null) throw new IllegalArgumentException("Rating not found");
@@ -88,7 +88,7 @@ public class RatingService {
         }
     }
 
-    // 🔥 NEU: Like toggle
+    //Like toggle
     public void toggleLike(String liker, int ratingId) {
         if (ratingDao.findById(ratingId) == null) {
             throw new IllegalArgumentException("Rating not found");
@@ -119,7 +119,7 @@ public class RatingService {
         }
     }
 
-    // 🔥 NEU: Hilfsmethode für Handler
+    //NEU: Hilfsmethode für Handler
     public Rating findById(int id) {
         return ratingDao.findById(id);
     }

@@ -42,8 +42,6 @@ public class UserService {
         return tokenToUsername.get(token);
     }
 
-    // ✅ Entferne die falsche } hier – war eine zu viel!
-
     public Map<String, Object> getProfile(String username) {
         int totalRatings = ratingDao.countByUser(username);
         Double avgRating = ratingDao.averageRatingByUser(username);
