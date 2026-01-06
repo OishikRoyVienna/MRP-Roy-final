@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        System.out.println("🚀 Starting MRP Final Server...");
+        System.out.println("🚀 Starting MRP Final Server 🚀 ");
 
         DatabaseManager.initializeDatabase();
 

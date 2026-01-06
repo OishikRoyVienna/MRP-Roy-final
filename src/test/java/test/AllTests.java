@@ -289,7 +289,7 @@ public class AllTests {
         MediaEntry m2 = new MediaEntry(); m2.setTitle("B"); m2.setMediaType("movie"); m2.setCreatorUsername("alice"); m2.setGenres(new String[]{"sci-fi", "action"});
         int id1 = mediaService.create(m1).getId();
         int id2 = mediaService.create(m2).getId();
-        // Bewertungen
+        //Bewertungen
         Rating r1 = new Rating(); r1.setMediaId(id1); r1.setUsername("alice"); r1.setStars(5);
         Rating r2 = new Rating(); r2.setMediaId(id2); r2.setUsername("alice"); r2.setStars(4);
         ratingService.createRating(r1, "alice");

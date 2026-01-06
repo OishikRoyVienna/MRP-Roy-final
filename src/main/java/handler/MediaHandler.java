@@ -54,7 +54,6 @@ public class MediaHandler {
             entry.setTitle((String) body.get("title"));
             entry.setMediaType((String) body.get("mediaType"));
             entry.setCreatorUsername(username);
-            // Optional: description, releaseYear, genres, ageRestriction
             if (body.containsKey("description")) entry.setDescription((String) body.get("description"));
             if (body.containsKey("releaseYear")) entry.setReleaseYear(((Number) body.get("releaseYear")).intValue());
             if (body.containsKey("genres")) {
@@ -184,7 +183,6 @@ public class MediaHandler {
         Integer minAge = null;
         Double minRating = null;
 
-        // Nur parsen, wenn Body vorhanden und nicht leer
         if (request.getBody() != null && !request.getBody().trim().isEmpty()) {
             try {
                 @SuppressWarnings("unchecked")

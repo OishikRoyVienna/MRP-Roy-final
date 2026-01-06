@@ -16,7 +16,7 @@ public class FavoriteService {
      * @throws IllegalArgumentException wenn das Media nicht existiert
      */
     public void addFavorite(String username, int mediaId) {
-        // Prüfe: Medium existiert?
+        // Prüfe, Medium existiert?
         if (mediaDao.findById(mediaId) == null) {
             throw new IllegalArgumentException("Media not found");
         }

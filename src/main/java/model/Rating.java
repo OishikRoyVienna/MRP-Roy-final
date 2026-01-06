@@ -13,7 +13,7 @@ public class Rating {
     private String timestamp;
 
     public Rating() {
-        this.timestamp = Instant.now().toString();  // z. B. "2026-01-06T10:30:45.123Z"
+        this.timestamp = Instant.now().toString();  //"2026-01-06T10:30:45.123Z"
         this.confirmed = false;
     }
 

@@ -95,7 +95,6 @@ public class MediaDao {
         return list;
     }
 
-    // 👇 Kompatibilität: alte Signatur weiterhin nutzbar (delegiert)
     public List<MediaEntry> findAll(String titleFilter) {
         return findAll(titleFilter, null, null, null, null);
     }

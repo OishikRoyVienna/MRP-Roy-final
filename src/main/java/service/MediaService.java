@@ -9,7 +9,7 @@ public class MediaService {
     protected MediaDao mediaDao = new MediaDao();
     protected RatingDao ratingDao = new RatingDao(); // optional, aber sauber
 
-    //5-Parameter-Version → benötigt für Filter
+    //5 Parameter-Version → benötigt für Filter
     public List<MediaEntry> list(String titleFilter, String genre, String mediaType,
                                  Integer minAge, Double minRating) {
         return mediaDao.findAll(titleFilter, genre, mediaType, minAge, minRating);

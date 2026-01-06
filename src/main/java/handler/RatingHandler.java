@@ -17,7 +17,7 @@ public class RatingHandler {
         String path = request.getPath();
         String method = request.getMethod();
 
-        //POST /api/ratings (dein curl nutzt das!)
+        //POST /api/ratings
         if ("POST".equals(method) && "/api/ratings".equals(path)) {
             return handleCreateRatingFromBody(request);
         }
