@@ -17,31 +17,31 @@ public class RatingHandler {
         String path = request.getPath();
         String method = request.getMethod();
 
-        // ✅ POST /api/ratings (dein curl nutzt das!)
+        //POST /api/ratings (dein curl nutzt das!)
         if ("POST".equals(method) && "/api/ratings".equals(path)) {
             return handleCreateRatingFromBody(request);
         }
-        // ✅ POST /api/media/123/ratings
+        //POST /api/media/123/ratings
         if ("POST".equals(method) && path.matches("/api/media/\\d+/ratings")) {
             return handleCreateRatingFromPath(request);
         }
-        // ✅ PUT /api/ratings/123
+        //PUT /api/ratings/123
         if ("PUT".equals(method) && path.matches("/api/ratings/\\d+")) {
             return handleUpdateRating(request);
         }
-        // ✅ DELETE /api/ratings/123
+        //DELETE /api/ratings/123
         if ("DELETE".equals(method) && path.matches("/api/ratings/\\d+")) {
             return handleDeleteRating(request);
         }
-        // ✅ PUT /api/ratings/123/confirm
+        //PUT /api/ratings/123/confirm
         if ("PUT".equals(method) && path.matches("/api/ratings/\\d+/confirm")) {
             return handleConfirmRating(request);
         }
-        // ✅ POST /api/ratings/123/like
+        //POST /api/ratings/123/like
         if ("POST".equals(method) && path.matches("/api/ratings/\\d+/like")) {
             return handleLikeRating(request);
         }
-        // ✅ GET /api/media/123/ratings
+        //GET /api/media/123/ratings
         if ("GET".equals(method) && path.matches("/api/media/\\d+/ratings")) {
             return handleGetRatings(request);
         }
