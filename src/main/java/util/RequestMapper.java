@@ -15,7 +15,7 @@ public class RequestMapper {
         request.setMethod(Method.valueOf(exchange.getRequestMethod()));
         request.setPath(exchange.getRequestURI().getPath());
 
-        //Authorization-Header direkt speichern
+        //Authorization Header direkt speichern
         String auth = exchange.getRequestHeaders().getFirst("Authorization");
         request.setAuthorization(auth);  //← direkt ins Feld
 

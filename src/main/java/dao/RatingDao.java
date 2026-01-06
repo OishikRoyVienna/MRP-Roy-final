@@ -23,7 +23,7 @@ public class RatingDao {
                 rating.setId(rs.getInt("id"));
                 rating.setTimestamp(rs.getTimestamp("timestamp").toInstant().toString());            }
             return rating;
-        } catch (SQLException e) {  // ✅ SQLException statt Exception
+        } catch (SQLException e) {
             throw new RuntimeException("Failed to insert rating", e);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -75,7 +75,7 @@ public class RatingDao {
         }
     }
 
-    private Rating mapRow(ResultSet rs) throws SQLException {  // ✅ throws SQLException
+    private Rating mapRow(ResultSet rs) throws SQLException {
         Rating r = new Rating();
         r.setId(rs.getInt("id"));
         r.setMediaId(rs.getInt("media_id"));

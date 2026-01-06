@@ -119,7 +119,6 @@ public class RatingService {
         }
     }
 
-    //NEU: Hilfsmethode für Handler
     public Rating findById(int id) {
         return ratingDao.findById(id);
     }

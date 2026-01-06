@@ -9,8 +9,6 @@ public class AuthService {
 
     protected static final ConcurrentHashMap<String, String> tokenRegistry = new ConcurrentHashMap<>();
 
-    /**
-     */
     public void register(String username, String password) {
         if (username == null || password == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("Username and password must not be empty");
@@ -22,7 +20,7 @@ public class AuthService {
     }
 
     /**
-     * Login: Prüft Klartext-Passwort und gibt Token zurück.
+     * Prüft Passwort und gibt Token zurück.
      */
     public String login(String username, String password) {
         User user = userDao.findByUsername(username);
@@ -35,7 +33,7 @@ public class AuthService {
     }
 
     /**
-     * Gibt den Benutzernamen zu einem Token zurück (statisch für Handler).
+     * Gibt den Benutzernamen zu einem Token zurück
      */
     public static String getUsernameByToken(String token) {
         return tokenRegistry.get(token);

@@ -12,8 +12,8 @@ public class FavoriteService {
      * Fügt ein Medium zu den Favoriten eines Benutzers hinzu.
      *
      * @param username  Der Benutzername
-     * @param mediaId   Die ID des Mediums
-     * @throws IllegalArgumentException wenn das Medium nicht existiert
+     * @param mediaId   Die ID des Media
+     * @throws IllegalArgumentException wenn das Media nicht existiert
      */
     public void addFavorite(String username, int mediaId) {
         // Prüfe: Medium existiert?
@@ -24,21 +24,18 @@ public class FavoriteService {
     }
 
     /**
-     * Entfernt ein Medium aus den Favoriten eines Benutzers.
+     * Entfernt ein Media aus den Favoriten
      */
     public void removeFavorite(String username, int mediaId) {
         favoriteDao.removeFavorite(username, mediaId);
     }
 
-    /**
-     * Gibt alle favorisierten Medien-IDs eines Benutzers zurück.
-     */
     public java.util.List<Integer> getFavoriteMediaIds(String username) {
         return favoriteDao.getFavoriteMediaIds(username);
     }
 
     /**
-     * Prüft, ob ein Medium zu den Favoriten eines Benutzers gehört.
+     * Prüft ob ein Media zu den Favoriten von Benutzers gehört
      */
     public boolean isFavorite(String username, int mediaId) {
         return favoriteDao.isFavorite(username, mediaId);

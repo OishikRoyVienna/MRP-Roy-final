@@ -39,7 +39,6 @@ public class MediaDao {
         return null;
     }
 
-    // 👇 Neue Signatur: alle Filter-Optionen (empfohlen)
     public List<MediaEntry> findAll(String titleFilter, String genre, String mediaType,
                                     Integer minAge, Double minRating) {
         StringBuilder sql = new StringBuilder(
