@@ -12,8 +12,9 @@ public class FavoriteDao {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fav.getUsername());
             ps.setInt(2, fav.getMediaId());
-            ps.executeUpdate();
+            ps.executeUpdate(); // ← Kein Fehler bei CONFLICT
         } catch (Exception e) {
+            e.printStackTrace(); // ← Zeigt echten Fehler
             throw new RuntimeException("Failed to add favorite", e);
         }
     }
