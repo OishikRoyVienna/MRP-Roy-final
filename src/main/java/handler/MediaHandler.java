@@ -111,7 +111,7 @@ public class MediaHandler {
             String idStr = request.getPath().split("/")[3];
             int id = Integer.parseInt(idStr);
             MediaEntry existing = mediaService.getById(id);
-            if (existing == null || !existing.getCreatorUsername().equals(username)) {
+            if (existing == null || !existing.getCreatorUsername().equals(username)) { //ownership logic
                 return new Response(Status.BAD_REQUEST, ContentType.APPLICATION_JSON,
                         "{\"error\":\"Only creator can edit\"}");
             }
