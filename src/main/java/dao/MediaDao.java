@@ -15,11 +15,18 @@ public class MediaDao {
             ps.setString(2, m.getDescription());
             ps.setString(3, m.getMediaType());
             ps.setObject(4, m.getReleaseYear());
-            ps.setArray(5, conn.createArrayOf("text", m.getGenres()));
+            if (m.getGenres() != null) {
+                ps.setArray(5, conn.createArrayOf("text", m.getGenres()));
+            } else {
+                ps.setNull(5, Types.ARRAY);
+            }
             ps.setObject(6, m.getAgeRestriction());
             ps.setString(7, m.getCreatorUsername());
+
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) m.setId(rs.getInt("id"));
+            if (rs.next()) {
+                m.setId(rs.getInt("id"));
+            }
             return m;
         } catch (Exception e) {
             throw new RuntimeException("Insert media failed", e);
