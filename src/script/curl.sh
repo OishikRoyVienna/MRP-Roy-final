@@ -1,112 +1,79 @@
 #!/bin/bash
-echo "🚀 Starting MRP Final Test Suite..."
-echo
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+echo "🚀 Starting MRP Final Test Suite...🚀"
 
-# 🔁 0. Reset DB
-echo -e "${YELLOW}0. Reset database...${NC}"
+# 0. Reset database
+echo -e "\n0. Reset database..."
 curl -X POST http://localhost:8080/api/reset
-echo
 
-# 1. Register
-echo -e "${YELLOW}1. Register user 'alice'...${NC}"
+# 1. Register user "alice"
+echo -e "\n1. Register user \"alice\"..."
 curl -X POST http://localhost:8080/api/users/register \
   -H "Content-Type: application/json" \
   -d '{"username":"alice","password":"123"}'
-echo
 
-# 2. Login → Token speichern
-echo -e "${YELLOW}2. Login user 'alice'...${NC}"
-RESP=$(curl -s -X POST http://localhost:8080/api/users/login \
+# 2. Login user "alice"
+echo -e "\n2. Login user \"alice\"..."
+response=$(curl -X POST http://localhost:8080/api/users/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"alice","password":"123"}')
-TOKEN=$(echo "$RESP" | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
-echo "→ Token: $TOKEN"
-echo
+  -d '{"username":"alice","password":"123"}' \
+  -s)
+token=$(echo "$response" | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+echo "$response"
 
-# 3. Create Media → Media-ID extrahieren
-echo -e "${YELLOW}3. Create media 'Inception'...${NC}"
-RESP=$(curl -s -X POST http://localhost:8080/api/media \
+# 3. Create media "Inception"
+echo -e "\n3. Create media \"Inception\"..."
+curl -X POST http://localhost:8080/api/media \
+  -H "Authorization: Bearer $token" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{
-    "title": "Inception",
-    "mediaType": "movie",
-    "genres": ["sci-fi"],
-    "ageRestriction": 12,
-    "creatorUsername": "alice"
-  }')
-MEDIA_ID=$(echo "$RESP" | grep -o '"id":[0-9]*' | cut -d: -f2)
-echo "→ Media ID: $MEDIA_ID"
-echo
+  -d '{"title":"Inception","mediaType":"movie","genres":["sci-fi"],"ageRestriction":12}'
 
-# 4. Create Rating (via /api/ratings)
-echo -e "${YELLOW}4. Create rating (5★, comment)...${NC}"
-RESP=$(curl -s -X POST http://localhost:8080/api/ratings \
+# 4. Create rating (5★, comment)
+echo -e "\n4. Create rating (5★, comment)..."
+curl -X POST http://localhost:8080/api/ratings \
+  -H "Authorization: Bearer $token" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d "{\"mediaId\":$MEDIA_ID,\"stars\":5,\"comment\":\"Amazing film!\"}")
-RATING_ID=$(echo "$RESP" | grep -o '"id":[0-9]*' | cut -d: -f2)
-echo "$RESP"
-echo "→ Rating ID: $RATING_ID"
-echo
+  -d '{"mediaId":1,"stars":5,"comment":"Amazing film!"}'
 
-# 5. Confirm Rating
-echo -e "${YELLOW}5. Confirm rating (moderation)...${NC}"
-RESP=$(curl -s -X PUT "http://localhost:8080/api/ratings/$RATING_ID/confirm" \
-  -H "Authorization: Bearer $TOKEN")
-echo "$RESP"
-echo
+# 5. Confirm rating (moderation)
+echo -e "\n5. Confirm rating (moderation)..."
+curl -X PUT http://localhost:8080/api/ratings/1/confirm \
+  -H "Authorization: Bearer $token"
 
-# 6. Update Rating
-echo -e "${YELLOW}6. Update rating (→ 4★)...${NC}"
-curl -s -X PUT "http://localhost:8080/api/ratings/$RATING_ID" \
+# 6. Update rating (→ 4★)
+echo -e "\n6. Update rating (→ 4★)..."
+curl -X PUT http://localhost:8080/api/ratings/1 \
+  -H "Authorization: Bearer $token" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{"stars":4,"comment":"Still great, but slightly overrated"}' | jq . 2>/dev/null || cat
-echo
+  -d '{"stars":4,"comment":"Still great, but slightly overrated"}'
 
-# 7. Like Rating
-echo -e "${YELLOW}7. Like rating...${NC}"
-curl -s -X POST "http://localhost:8080/api/ratings/$RATING_ID/like" \
-  -H "Authorization: Bearer $TOKEN"
-echo '{"message":"Like toggled"}'
-echo
+# 7. Like rating
+echo -e "\n7. Like rating..."
+curl -X POST http://localhost:8080/api/ratings/1/like \
+  -H "Authorization: Bearer $token"
 
-# 8. Add to Favorites
-echo -e "${YELLOW}8. Add to favorites...${NC}"
-curl -s -X POST "http://localhost:8080/api/favorites/$MEDIA_ID" \
-  -H "Authorization: Bearer $TOKEN"
-echo '{"message":"Added to favorites"}'
-echo
+# 8. Add to favorites
+echo -e "\n8. Add to favorites..."
+curl -X POST http://localhost:8080/api/favorites/1 \
+  -H "Authorization: Bearer $token"
 
-# 9. Search & Filter
-echo -e "${YELLOW}9. Search: sci-fi, minRating=3...${NC}"
-curl -s -X GET http://localhost:8080/api/media \
-  -H "Authorization: Bearer $TOKEN" \
+# 9. Search: sci-fi, minRating=3
+echo -e "\n9. Search: sci-fi, minRating=3..."
+curl -X GET http://localhost:8080/api/media \
   -H "Content-Type: application/json" \
   -d '{"genre":"sci-fi","minRating":3}'
-echo
 
-# 10. Get Favorites
-echo -e "${YELLOW}10. Get favorites (IDs)...${NC}"
-curl -s -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/favorites
-echo
+# 10. Get favorites (IDs)
+echo -e "\n10. Get favorites (IDs)..."
+curl -H "Authorization: Bearer $token" http://localhost:8080/api/favorites
 
-# 11. Get Profile
-echo -e "${YELLOW}11. Get profile (stats + favoriteGenre)...${NC}"
-curl -s -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/users/alice/profile
-echo
+# 11. Get profile (stats + favoriteGenre)
+echo -e "\n11. Get profile (stats + favoriteGenre)..."
+curl -H "Authorization: Bearer $token" http://localhost:8080/api/users/alice/profile
 
-# 12. Delete Rating
-echo -e "${YELLOW}12. Delete rating...${NC}"
-curl -s -X DELETE "http://localhost:8080/api/ratings/$RATING_ID" \
-  -H "Authorization: Bearer $TOKEN"
-echo '{"message":"Rating deleted"}'
-echo
+# 12. Delete rating
+echo -e "\n12. Delete rating..."
+curl -X DELETE http://localhost:8080/api/ratings/1 \
+  -H "Authorization: Bearer $token"
 
-echo -e "${GREEN}🎉 Test suite completed successfully. 🎉${NC}"
+echo -e "\n🎉 Test suite completed successfully. 🎉"

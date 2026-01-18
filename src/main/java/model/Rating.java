@@ -1,5 +1,7 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.Instant;
 
 public class Rating {
@@ -9,7 +11,7 @@ public class Rating {
     private Integer stars;
     private String comment;
     private boolean confirmed;
-
+    @JsonIgnore
     private String timestamp;
 
     public Rating() {
@@ -42,6 +44,7 @@ public class Rating {
     public String getTimestamp() { return timestamp; }
     public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
 
+    @JsonIgnore
     public Instant getTimestampAsInstant() {
         return timestamp != null ? Instant.parse(timestamp) : null;
     }

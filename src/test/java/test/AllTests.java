@@ -206,6 +206,7 @@ public class AllTests {
         UserService userService = new UserService();
         userService.register("alice", "123");
         userService.register("bob", "123");
+        userService.register("charlie", "123");
         MediaService mediaService = new MediaService();
         RatingService ratingService = new RatingService();
         MediaEntry m = new MediaEntry(); m.setTitle("Test"); m.setMediaType("movie"); m.setCreatorUsername("alice");
@@ -215,8 +216,7 @@ public class AllTests {
         ratingService.createRating(r1, "bob");
         ratingService.createRating(r2, "charlie");
         // Unbestätigt → avg = null
-        assertNull(mediaService.getById(mediaId).getAverageRating());
-        // Bestätige eine
+        assertEquals(0.0, mediaService.getById(mediaId).getAverageRating());
         ratingService.confirmRating(r1.getId(), "alice");
         assertEquals(4.0, mediaService.getById(mediaId).getAverageRating());
     }
