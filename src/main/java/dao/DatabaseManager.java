@@ -9,10 +9,8 @@ public class DatabaseManager {
 
     public static void initializeDatabase() {
         try (Connection conn = getConnection()) {
-            // 1. Stelle sicher, dass Tabellen existieren
             ensureTablesExist(conn);
 
-            // 2. LEERE IMMER alle Tabellen (unabhängig vom Vorhandensein)
             try (Statement stmt = conn.createStatement()) {
                 // Reihenfolge wegen Fremdschlüssel: zuerst abhängige Tabellen
                 stmt.execute("TRUNCATE TABLE likes RESTART IDENTITY CASCADE");
