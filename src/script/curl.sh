@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "🚀 Starting MRP Final Test Suite..."
+echo "🚀 Starting MRP Final Test Suite 🚀"
 echo
 
 RED='\033[0;31m'
@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# 🔁 0. Reset DB
+# 0. Reset DB
 echo -e "${YELLOW}0. Reset database...${NC}"
 curl -X POST http://localhost:8080/api/reset
 echo
